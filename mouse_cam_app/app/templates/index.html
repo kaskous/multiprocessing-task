@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mouse and Webcam Capture</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const socket = io();
+
+            document.addEventListener('mousemove', (e) => {
+                socket.emit('mouse_move', { x: e.clientX, y: e.clientY });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.button === 0) { // Left mouse button
+                    socket.emit('capture_image', { x: e.clientX, y: e.clientY });
+                }
+            });
+
+            socket.on('mouse_update', (data) => {
+                document.getElementById('mouse_coords').textContent = `X: ${data.x}, Y: ${data.y}`;
+            });
+
+            socket.on('image_captured', (data) => {
+                document.getElementById('image').src = data.filename;
+                alert(`Image captured and saved as ${data.filename}`);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Mouse and Webcam Capture</h1>
+    <div id="mouse_coords">X: 0, Y: 0</div>
+    <img id="image" style="width: 300px;"/>
+</body>
+</html>
